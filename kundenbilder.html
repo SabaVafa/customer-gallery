@@ -4881,16 +4881,26 @@ h1,h2,h3,.display{text-wrap:balance;}
     }
     function apply(p, anim){ track.classList.toggle('is-anim', !!anim); track.style.transform='translateX(-'+(p*100)+'%)'; }
     var pos=1, snap=null;
-    function go(p){
-      pos=p; apply(pos, true); paint(realOf(pos));
+    function slide(p){ pos=p; apply(pos, true); paint(realOf(pos)); }
+    // instant (no-transition) jump to p, committed with a reflow so a following
+    // animated move starts from here instead of sliding back across the clones
+    function jump(p){ apply(p, false); void track.offsetWidth; pos=p; }
+    // if we're parked on a clone, resolve it to its real twin before moving.
+    // this is what keeps rapid nav (hover/click faster than the snap) from
+    // marching pos past the clone and leaving the media blank
+    function settleClone(){ if(pos >= N+1){ jump(1); } else if(pos <= 0){ jump(N); } }
+    function go(p){ if(snap){ clearTimeout(snap); snap=null; } settleClone(); slide(p); }
+    function loopStep(dir){
       if(snap){ clearTimeout(snap); snap=null; }
-      if(pos===0){ snap=setTimeout(function(){ apply(N,false); pos=N; }, 720); }
-      else if(pos===N+1){ snap=setTimeout(function(){ apply(1,false); pos=1; }, 720); }
+      settleClone();
+      slide(pos + dir);
+      if(pos === N+1){ snap=setTimeout(function(){ jump(1); snap=null; }, 720); }
+      else if(pos === 0){ snap=setTimeout(function(){ jump(N); snap=null; }, 720); }
     }
     apply(1,false); paint(0);
     var timer=null;
-    function next(){ go(pos+1); }
-    function prev(){ go(pos-1); }
+    function next(){ loopStep(1); }
+    function prev(){ loopStep(-1); }
     function start(){ if(reduce||galLbOpen) return; stop(); timer=setInterval(next, 3600); }
     function stop(){ if(timer){ clearInterval(timer); timer=null; } }
     function restart(){ stop(); start(); }
