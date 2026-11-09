@@ -3578,6 +3578,8 @@ p{margin:0 0 1rem;}
 .gal-more__btn:focus-visible{outline:0.1875rem solid var(--color-teal); outline-offset:0.2rem; border-radius:var(--r-s);}
 .gal-more__btn svg{width:1.05rem; height:1.05rem; transition:transform .18s ease;}
 .gal-more__btn:hover svg{transform:translateY(0.1rem);}
+.gal-more__btn.is-less svg{transform:rotate(180deg);}
+.gal-more__btn.is-less:hover svg{transform:rotate(180deg) translateY(0.1rem);}
 
 .gal-tile{margin:0; position:relative; border-radius:var(--radius-lg); overflow:hidden; background:var(--color-graphite-100); cursor:pointer; box-shadow:var(--shadow-card); border:0.0625rem solid var(--color-graphite-200); display:block; width:100%; text-align:left; padding:0; color:inherit; transition:box-shadow .18s, transform .18s;}
 .gal-tile:hover{box-shadow:var(--shadow-hover); transform:translateY(-0.125rem);}
@@ -4059,7 +4061,7 @@ h1,h2,h3,.display{text-wrap:balance;}
     <div class="container">
       <div class="gal-grid" id="grid"><!-- tiles injected by JS --></div>
       <div class="gal-more" id="galMoreWrap" hidden>
-        <button class="gal-more__btn" id="galMore" type="button">Weitere Fotos anzeigen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <button class="gal-more__btn" id="galMore" type="button"><span class="gal-more__label">Weitere Fotos anzeigen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
       </div>
     </div>
   </section>
@@ -4617,6 +4619,7 @@ h1,h2,h3,.display{text-wrap:balance;}
   var INITIAL_SHOWN=12, SHOWN_STEP=8, maxShown=INITIAL_SHOWN;
   var moreWrap=document.getElementById('galMoreWrap');
   var moreBtn=document.getElementById('galMore');
+  var moreLabel=moreBtn?moreBtn.querySelector('.gal-more__label'):null;
   function tileRatio(t){ var im=t.querySelector('img'); return (im && im.naturalWidth) ? im.naturalHeight/im.naturalWidth : 0.78; }
   function layoutGrid(){
     var n = colCountFor(window.innerWidth);
@@ -4633,12 +4636,28 @@ h1,h2,h3,.display{text-wrap:balance;}
       cols[mi].appendChild(t); h[mi] += tileRatio(t) + 0.06; // +gap-ish
       placed++;
     });
-    if(moreWrap){ moreWrap.hidden = (totalVisible - placed) <= 0; }
+    if(moreWrap){
+      var remaining = totalVisible - placed;
+      if(remaining > 0){                       // more to reveal
+        moreWrap.hidden = false; moreBtn.dataset.mode = 'more';
+        moreBtn.classList.remove('is-less');
+        if(moreLabel) moreLabel.textContent = 'Weitere Fotos anzeigen';
+      } else if(placed > INITIAL_SHOWN){        // fully expanded -> offer collapse
+        moreWrap.hidden = false; moreBtn.dataset.mode = 'less';
+        moreBtn.classList.add('is-less');
+        if(moreLabel) moreLabel.textContent = 'Weniger anzeigen';
+      } else {                                  // everything fits in the initial batch
+        moreWrap.hidden = true;
+      }
+    }
   }
   var _rlt=null; function relayoutSoon(){ clearTimeout(_rlt); _rlt=setTimeout(layoutGrid, 120); }
   tiles.forEach(function(t){ var im=t.querySelector('img'); if(im) im.addEventListener('load', relayoutSoon); });
   window.addEventListener('resize', relayoutSoon);
-  if(moreBtn) moreBtn.addEventListener('click', function(){ maxShown += SHOWN_STEP; layoutGrid(); });
+  if(moreBtn) moreBtn.addEventListener('click', function(){
+    if(moreBtn.dataset.mode === 'less'){ maxShown = INITIAL_SHOWN; layoutGrid(); scrollToResults(); }
+    else { maxShown += SHOWN_STEP; layoutGrid(); }
+  });
 
   function applyFilter(cat){
     current = cat;
