@@ -3571,14 +3571,12 @@ p{margin:0 0 1rem;}
 .gal-grid{display:flex; align-items:flex-start; gap:1rem;}
 .gal-col{flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:1rem;}
 @media(max-width:48rem){ .gal-grid, .gal-col{gap:0.75rem;} }
-/* "show more" reveal below the grid */
-.gal-more{display:flex; justify-content:center; padding:2.75rem 0 0.25rem;}
-.gal-more__btn{display:inline-flex; align-items:center; gap:0.55rem; padding:0.7rem 1.5rem; border-radius:var(--radius-pill); border:0.09375rem solid var(--color-teal); background:transparent; color:var(--color-teal); font-size:0.9375rem; font-weight:600; letter-spacing:0.01em; cursor:pointer; transition:background .18s ease, color .18s ease, box-shadow .18s ease;}
-.gal-more__btn:hover{background:var(--color-teal); color:var(--color-white); box-shadow:0 0.5rem 1rem rgba(1,82,83,0.22);}
-.gal-more__btn:focus-visible{outline:0.1875rem solid var(--color-teal); outline-offset:0.2rem;}
-.gal-more__count{display:inline-flex; align-items:center; justify-content:center; min-width:1.4rem; height:1.4rem; padding:0 0.4rem; border-radius:var(--radius-pill); background:var(--color-teal); color:var(--color-white); font-size:0.75rem; font-weight:700;}
-.gal-more__btn:hover .gal-more__count{background:var(--color-white); color:var(--color-teal);}
-.gal-more__btn svg{width:1.05rem; height:1.05rem; transition:transform .18s ease;}
+/* "show more" reveal below the grid — plain text label + drop chevron */
+.gal-more{display:flex; justify-content:center; padding:2rem 0 0.25rem;}
+.gal-more__btn{display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.5rem; border:0; background:transparent; color:var(--color-teal); font-size:0.9375rem; font-weight:600; letter-spacing:0.01em; cursor:pointer;}
+.gal-more__btn:hover{color:var(--color-teal-700); text-decoration:underline; text-underline-offset:0.2rem;}
+.gal-more__btn:focus-visible{outline:0.1875rem solid var(--color-teal); outline-offset:0.2rem; border-radius:var(--r-s);}
+.gal-more__btn svg{width:1rem; height:1rem; transition:transform .18s ease;}
 .gal-more__btn:hover svg{transform:translateY(0.1rem);}
 
 .gal-tile{margin:0; position:relative; border-radius:var(--radius-lg); overflow:hidden; background:var(--color-graphite-100); cursor:pointer; box-shadow:var(--shadow-card); border:0.0625rem solid var(--color-graphite-200); display:block; width:100%; text-align:left; padding:0; color:inherit; transition:box-shadow .18s, transform .18s;}
@@ -4061,7 +4059,7 @@ h1,h2,h3,.display{text-wrap:balance;}
     <div class="container">
       <div class="gal-grid" id="grid"><!-- tiles injected by JS --></div>
       <div class="gal-more" id="galMoreWrap" hidden>
-        <button class="gal-more__btn" id="galMore" type="button">Weitere Fotos anzeigen <span class="gal-more__count" id="galMoreCount"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+        <button class="gal-more__btn" id="galMore" type="button">Weitere Fotos anzeigen <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
       </div>
     </div>
   </section>
@@ -4619,7 +4617,6 @@ h1,h2,h3,.display{text-wrap:balance;}
   var INITIAL_SHOWN=12, SHOWN_STEP=8, maxShown=INITIAL_SHOWN;
   var moreWrap=document.getElementById('galMoreWrap');
   var moreBtn=document.getElementById('galMore');
-  var moreCount=document.getElementById('galMoreCount');
   function tileRatio(t){ var im=t.querySelector('img'); return (im && im.naturalWidth) ? im.naturalHeight/im.naturalWidth : 0.78; }
   function layoutGrid(){
     var n = colCountFor(window.innerWidth);
@@ -4636,11 +4633,7 @@ h1,h2,h3,.display{text-wrap:balance;}
       cols[mi].appendChild(t); h[mi] += tileRatio(t) + 0.06; // +gap-ish
       placed++;
     });
-    if(moreWrap){
-      var remaining = totalVisible - placed;
-      moreWrap.hidden = remaining <= 0;
-      if(moreCount) moreCount.textContent = remaining > 0 ? remaining : '';
-    }
+    if(moreWrap){ moreWrap.hidden = (totalVisible - placed) <= 0; }
   }
   var _rlt=null; function relayoutSoon(){ clearTimeout(_rlt); _rlt=setTimeout(layoutGrid, 120); }
   tiles.forEach(function(t){ var im=t.querySelector('img'); if(im) im.addEventListener('load', relayoutSoon); });
