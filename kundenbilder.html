@@ -280,11 +280,13 @@ h1, h2, h3, h4, h5, h6, p { margin: 0; }
 }
 .topbar__links a:hover { color: var(--color-mint); }
 /* Trusted-Shops-style rating cluster (matches the live shop top bar) */
-.topbar__rating { gap: 7px !important; color: #fff !important; }
+.topbar__rating { gap: 7px !important; color: #fff !important; white-space: nowrap; }
 .topbar__rating .topbar__stars { display: inline-flex; align-items: center; gap: 1px; color: var(--color-star); }
 .topbar__rating .topbar__stars svg { width: 13px; height: 13px; display: block; }
 .topbar__rating strong { font-weight: 700; color: #fff; }
 .topbar__rating .topbar__reviews { color: rgba(255, 255, 255, 0.72); }
+/* very narrow phones: drop the verdict so the cluster stays on one line */
+@media (max-width: 359px) { .topbar__rating .topbar__verdict { display: none; } }
 
 .header {
   position: sticky;
@@ -3838,7 +3840,7 @@ h1,h2,h3,.display{text-wrap:balance;}
       <li>Original Metzler Qualität seit 2013</li>
       <li class="topbar__rating" aria-label="Bewertung: 4,73 von 5 Sternen, Sehr gut, 33.223 Bewertungen">
         <span class="topbar__stars" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 5.9 21.2l1.4-6.8L2.2 9.7l6.9-.7z"/></svg></span>
-        <strong>4,73</strong> Sehr gut <span class="topbar__reviews">33.223 Bewertungen</span>
+        <strong>4,73</strong> <span class="topbar__verdict">Sehr gut</span> <span class="topbar__reviews">33.223 Bewertungen</span>
       </li>
     </ul>
     <div class="topbar__links">
